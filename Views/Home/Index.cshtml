@@ -1,0 +1,96 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer localizer 
+
+@{
+    ViewData["Title"] = "Listado de Tareas";
+}
+
+<div class="text-center">
+    <h1 class="display-4">@localizer["Mis tareas"]</h1>
+    <button type="button" 
+            class="btn btn-success" 
+            onclick="agregarTarea()" 
+            style="float: right; margin-top: -60px;">
+        @localizer["Agregar nueva tarea"]
+    </button>
+</div>
+
+<div id="contenedor-listado" class="text-center">
+    <div id="reordenable" class="text-start" data-bind="foreach: tareas">
+        <div name="tarea" 
+             class="border mb-2 p-2" 
+             style="cursor: pointer"
+             data-bind="click: manejarTarea">
+            <div data-bind="text: titulo, hidden: esNuevo" class="fw-bold">
+
+            </div>
+
+            <input type="text"
+                   name="titulo-tarea"
+                   autocomplete="off"
+                   data-bind="value: titulo, 
+                              visible: esNuevo, 
+                              attr: {'data-id': id},
+                              event: { focusout: manejarFocusTarea }" />
+        </div>
+    </div>
+
+    <div data-bind="visible: cargando" class="spinner-border">
+        <span class="visually-hidden">Cargando...</span>
+    </div>
+
+    <div data-bind="visible: noTareas">
+        ¡No existen tareas para mostrar!
+    </div>
+</div>
+
+<partial name="_EditarTareaViewModel"></partial>
+
+@section Scripts {
+    <script src="~/js/tareas.js" asp-append-version="true"></script>
+    <script src="~/js/utilidades.js" asp-append-version="true"></script>
+    <script>
+        const urlTarea = "/api/tareas";
+        const editarTareaC = document.getElementById('modal-editar-tarea');
+        const modalEditarTarea = new bootstrap.Modal(editarTareaC);
+
+        /* ViewModel */
+        function tareaListado() {
+            var self = this;
+
+            self.tareas = ko.observableArray([]);
+            self.cargando = ko.observable(true);
+
+            self.noTareas = ko.pureComputed(function() {
+                if (self.cargando()) {
+                    return false;    
+                }
+
+                return self.tareas().length === 0;
+            });
+        } 
+
+        function tareaElementoListado({id, titulo}) {
+            var self = this;
+
+            self.id = ko.observable(id);
+            self.titulo = ko.observable(titulo);
+            self.esNuevo = ko.pureComputed(function() {
+                return self.id() == 0;
+            });
+        }
+
+        const editarTareaViewModel = {
+            id: 0,
+            titulo: ko.observable(''),
+            descripcion: ko.observable('')
+        };
+
+        const tareaListadoViewModel = new tareaListado();
+
+        obtenerTareas();
+
+        ko.applyBindings(tareaListadoViewModel, document.getElementById('contenedor-listado'));
+        ko.applyBindings(editarTareaViewModel, document.getElementById('modal-editar-tarea'))
+    </script>
+}
