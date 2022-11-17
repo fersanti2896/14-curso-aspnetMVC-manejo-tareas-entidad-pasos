@@ -57,7 +57,7 @@ async function manejarFocusTarea(tarea) {
     }
 }
 
-async function obtenerIDsTareas() {
+function obtenerIDsTareas() {
     const ids = $("[name=titulo-tarea]").map(function () {
         return $(this).attr("data-id");
     }).get();

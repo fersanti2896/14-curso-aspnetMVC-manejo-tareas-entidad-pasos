@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 using Microsoft.AspNetCore.Mvc.Razor;
 using ManejoTareas.Services;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 var politicaUsuarioAutenticados = new AuthorizationPolicyBuilder().RequireAuthenticatedUser()
@@ -21,6 +22,9 @@ builder.Services.AddControllersWithViews(opc => {
       opc.DataAnnotationLocalizerProvider = (_, factoria) => 
         factoria.Create(typeof(RecursoCompartido)
       );
+  })
+  .AddJsonOptions(opc => {
+      opc.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
   });
 
 /* Configurando el DbContext */
