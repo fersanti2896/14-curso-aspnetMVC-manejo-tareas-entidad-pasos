@@ -41,10 +41,22 @@ async function manejarSalvarPaso(paso) {
     const idTarea = editarTareaViewModel.id;
     const data = obtenerCuerpoPeticion(paso);
 
+    const descripcion = paso.descripcion();
+
+    if (!descripcion) {
+        paso.descripcion(paso.descripcionAnterior);
+
+        if (esNuevo) {
+            editarTareaViewModel.pasos.pop()
+        }
+
+        return;
+    }
+
     if (esNuevo) {
         await insertarPaso(paso, data, idTarea);
     } else {
-
+        actualizarPaso(data, paso.id());
     }
 }
 
@@ -52,7 +64,28 @@ function manejarCancelarPaso(paso) {
     if (paso.esNuevo()) {
         editarTareaViewModel.pasos.pop();
     } else {
-
+        paso.modoEdicion(false);
+        paso.descripcion(paso.descripcionAnterior);
     }
 }
 
+/* Actualizando un paso */
+function manejarDescripcionPaso(paso) {
+    paso.modoEdicion(true);
+    paso.descripcionAnterior = paso.descripcion();
+    $("[name=txtPasoDescripcion]:visible").focus();
+}
+
+async function actualizarPaso(data, id) {
+    const resp = await fetch(`${urlPasos}/${id}`, {
+        method: 'PUT',
+        body: data,
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+
+    if (!resp.ok) {
+        manejarErrorAPI(resp);
+    }
+}

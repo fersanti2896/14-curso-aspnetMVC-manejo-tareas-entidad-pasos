@@ -50,5 +50,27 @@ namespace ManejoTareas.Controllers {
 
             return paso;
         }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(Guid id, [FromBody] PasoDTO pasoDTO) {
+            var usuarioID = usuarioRepository.ObtenerUsuarioId();
+            var paso = await context.Pasos.Include(p => p.Tarea)
+                                          .FirstOrDefaultAsync(p => p.Id == id);
+
+            if (paso is null) {
+                return NotFound();
+            }
+
+            if (paso.Tarea.UsuarioId != usuarioID) {
+                return Forbid();
+            }
+
+            paso.Descripcion = pasoDTO.Descripcion;
+            paso.Realizado = pasoDTO.Realizado;
+
+            await context.SaveChangesAsync();
+
+            return Ok();
+        }
     }
 }

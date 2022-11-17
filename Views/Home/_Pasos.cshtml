@@ -19,9 +19,12 @@
             </div>
 
             <div class="col-11">
-                <span data-bind="text: descripcion, 
+                <span style="cursor: pointer" 
+                      data-bind="text: descripcion, 
                                  hidden: modoEdicion, 
-                                 css: { 'text-decoration-line-through': realizado }"></span>
+                                 click: manejarDescripcionPaso,
+                                 css: { 'text-decoration-line-through': realizado }">
+                </span>
                 <textarea name="txtPasoDescripcion" 
                           class="form-control" 
                           placeholder="Agregue una descripcion"
