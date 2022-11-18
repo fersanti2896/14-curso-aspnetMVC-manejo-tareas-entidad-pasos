@@ -204,3 +204,10 @@ $(function () {
         }
     })
 })
+
+/* Obtiene tarea de edicion para actualizar numero de completado */
+function obtenerTareaEdicion() {
+    const indice = obtenerIndiceTarea();
+
+    return tareaListadoViewModel.tareas()[indice];
+}

@@ -29,6 +29,14 @@ async function insertarPaso(paso, data, idTarea) {
     if (resp.ok) {
         const json = await resp.json();
         paso.id(json.id);
+
+        const tarea = obtenerTareaEdicion();
+        tarea.pasosTotal(tarea.pasosTotal() + 1);
+
+
+        if (paso.realizado()) {
+            tarea.pasosRealizados(tarea.pasosRealizados() + 1);
+        }
     } else {
         manejarErrorAPI(resp);
     }
@@ -99,6 +107,18 @@ function manejarCheckboxPaso(paso) {
     const data = obtenerCuerpoPeticion(paso);
     actualizarPaso(data, paso.id());
 
+    /* Actualiza el numero de pasos */
+    const tarea = obtenerTareaEdicion();
+    let pasosRealizadosActual = tarea.pasosRealizados();
+
+    if (paso.realizado()) {
+        pasosRealizadosActual++;
+    } else {
+        pasosRealizadosActual--;
+    }
+
+    tarea.pasosRealizados(pasosRealizadosActual);
+
     return true;
 }
 
@@ -117,6 +137,13 @@ async function borrarPaso(paso) {
     editarTareaViewModel.pasos.remove(function (item) {
         return item.id() == paso.id()
     });
+
+    const tarea = obtenerTareaEdicion();
+    tarea.pasosTotal(tarea.pasosTotal() - 1);
+
+    if (paso.realizado()) {
+        tarea.pasosRealizados(tarea.pasosRealizados() - 1);
+    }
 }
 
 function manejarBorrarPaso(paso) {
