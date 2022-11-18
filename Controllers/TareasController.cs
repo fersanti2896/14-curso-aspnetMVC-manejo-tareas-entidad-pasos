@@ -38,7 +38,7 @@ namespace ManejoTareas.Controllers {
         public async Task<ActionResult<Tarea>> Get(int id) {
             var usuarioID = usuarioRepository.ObtenerUsuarioId();
             var tarea = await context.Tareas
-                                     .Include(t => t.Pasos) /* Carga los pasos de la tarea */
+                                     .Include(t => t.Pasos.OrderBy(p => p.Orden)) /* Carga los pasos de la tarea */
                                      .FirstOrDefaultAsync(t => t.Id == id && t.UsuarioId == usuarioID);
 
             if (tarea is null) {

@@ -161,3 +161,46 @@ function manejarBorrarPaso(paso) {
     });
 }
 
+/* Obtiene los id de los pasos */
+function obtenerIdsPasos() {
+    const ids = $("[name=chbPaso]").map(function () {
+        return $(this).attr('data-id');
+    }).get();
+
+    return ids;
+}
+
+/* Manda los pasos al backend */
+async function enviarIdsPasos(ids) {
+    var data = JSON.stringify(ids);
+
+    await fetch(`${urlPasos}/ordenar/${editarTareaViewModel.id}`, {
+        method: 'POST',
+        body: data,
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+}
+
+/* Ordena los pasos */
+async function actualizarOrdenPasos() {
+    const ids = obtenerIdsPasos();
+    await enviarIdsPasos(ids);
+
+    const arreOrganizado = editarTareaViewModel.pasos.sorted(function (a, b) {
+        return ids.indexOf(a.id().toString()) - ids.indexOf(b.id().toString());
+    });
+
+    editarTareaViewModel.pasos(arreOrganizado);
+}
+
+$(function () {
+    $("#reordenable-pasos").sortable({
+        axis: 'y',
+        stop: async function () {
+            await actualizarOrdenPasos();
+        }
+    })
+})
+

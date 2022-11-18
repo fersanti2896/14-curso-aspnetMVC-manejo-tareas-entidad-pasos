@@ -92,5 +92,34 @@ namespace ManejoTareas.Controllers {
 
             return Ok();
         }
+
+        [HttpPost("ordenar/{tareaId:int}")]
+        public async Task<IActionResult> Ordenar(int tareaId, [FromBody] Guid[] ids) {
+            var usuarioID = usuarioRepository.ObtenerUsuarioId();
+            var tarea = await context.Tareas.FirstOrDefaultAsync(t => t.Id == tareaId && t.UsuarioId == usuarioID);
+
+            if (tarea is null) {
+                return NotFound();
+            }
+
+            var pasos = await context.Pasos.Where(p => p.TareaId == tareaId).ToListAsync();
+            var pasosIds = pasos.Select(x => x.Id);
+            var pasoNoPertenece = ids.Except(pasosIds).ToList();
+
+            if (pasoNoPertenece.Any()) { 
+                return BadRequest("No todos los pasos están presentes");
+            }
+
+            var pasosDic = pasos.ToDictionary(p => p.Id);
+
+            for (int i = 0; i < ids.Length; i++) {
+                var id = ids[i];
+                var paso = pasosDic[id];
+                paso.Orden = i + 1;
+            }
+
+            await context.SaveChangesAsync();
+            return Ok();
+        }
     }
 }
