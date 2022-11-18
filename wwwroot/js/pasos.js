@@ -101,3 +101,36 @@ function manejarCheckboxPaso(paso) {
 
     return true;
 }
+
+/* Borra un paso */
+async function borrarPaso(paso) {
+    const resp = await fetch(`${urlPasos}/${paso.id()}`, {
+        method: 'DELETE'
+    });
+
+    if (!resp.ok) {
+        manejarErrorAPI(resp);
+
+        return;
+    }
+
+    editarTareaViewModel.pasos.remove(function (item) {
+        return item.id() == paso.id()
+    });
+}
+
+function manejarBorrarPaso(paso) {
+    modalEditarTarea.hide();
+
+    confirmarAccion({
+        callBackAceptar: () => {
+            borrarPaso(paso);
+            modalEditarTarea.show();
+        },
+        callBackCancelar: () => {
+            modalEditarTarea.show();
+        },
+        titulo: '¿Desea borrar este paso?'
+    });
+}
+
