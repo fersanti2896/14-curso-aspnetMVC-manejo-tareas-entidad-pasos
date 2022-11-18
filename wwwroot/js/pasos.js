@@ -89,3 +89,15 @@ async function actualizarPaso(data, id) {
         manejarErrorAPI(resp);
     }
 }
+
+/* Actualiza el paso como realizado */
+function manejarCheckboxPaso(paso) {
+    if (paso.esNuevo()) {
+        return true;
+    }
+
+    const data = obtenerCuerpoPeticion(paso);
+    actualizarPaso(data, paso.id());
+
+    return true;
+}
